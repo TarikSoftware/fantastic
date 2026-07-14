@@ -1,9 +1,0 @@
-fastapi
-uvicorn[standard]
-motor
-pymongo[srv]
-pyjwt
-bcrypt
-pydantic
-pyngrok
-nest_asyncio
