@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fantastic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+    --bg: #f5f3fb;
+    --surface: #ffffff;
+    --ink: #241d3a;
+    --ink-soft: #6f688a;
+    --line: #e9e5f4;
+    --primary: #7c5cd6;
+    --primary-deep: #5b3fb8;
+    --primary-soft: #f0ebfc;
+    --like: #e8467c;
+    --online: #2ec98e;
+    --danger: #e05252;
+    --radius: 16px;
+    --shadow: 0 4px 20px rgba(60, 40, 120, 0.07);
+}
+
+* { box-sizing: border-box; }
+body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    margin: 0;
+    color: var(--ink);
+}
+button { font-family: inherit; }
+input, textarea { font-family: inherit; color: var(--ink); }
+
+/* ---------- ÜST ÇUBUK ---------- */
+.topbar {
+    position: sticky; top: 0; z-index: 600;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    display: flex; align-items: center; gap: 16px;
+    padding: 10px 20px;
+}
+.logo {
+    font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px;
+    background: linear-gradient(120deg, #7c5cd6, #b46be0, #e8467c);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    cursor: pointer; user-select: none; white-space: nowrap;
+}
+.search-wrap { flex: 1; max-width: 420px; position: relative; }
+.search-wrap input {
+    width: 100%; padding: 10px 14px 10px 38px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--bg); outline: none; font-size: 14px;
+    transition: border-color .2s, background .2s;
+}
+.search-wrap input:focus { border-color: var(--primary); background: var(--surface); }
+.search-wrap::before { content: "🔍"; position: absolute; left: 13px; top: 9px; font-size: 14px; opacity: .55; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.icon-btn {
+    position: relative; background: var(--bg); border: 1px solid var(--line);
+    width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 17px;
+    display: flex; align-items: center; justify-content: center; transition: background .2s;
+}
+.icon-btn:hover { background: var(--primary-soft); }
+.badge {
+    position: absolute; top: -4px; right: -4px;
+    background: var(--like); color: #fff; font-size: 10px; font-weight: 700;
+    border-radius: 10px; min-width: 17px; height: 17px; padding: 0 4px;
+    display: none; align-items: center; justify-content: center;
+    border: 2px solid var(--surface);
+}
+
+/* ---------- AVATARLAR ---------- */
+.avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.avatar-fallback {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 700; font-size: 16px; user-select: none;
+}
+.avatar-sm, .avatar-sm.avatar-fallback { width: 30px; height: 30px; font-size: 12px; }
+.avatar-lg, .avatar-lg.avatar-fallback { width: 84px; height: 84px; font-size: 32px; }
+.clickable { cursor: pointer; }
+
+/* ---------- YERLEŞİM ---------- */
+.layout {
+    display: grid; grid-template-columns: minmax(0, 620px) 280px;
+    gap: 24px; justify-content: center;
+    max-width: 960px; margin: 24px auto; padding: 0 16px;
+}
+.sidebar { position: sticky; top: 80px; align-self: start; display: flex; flex-direction: column; gap: 16px; }
+@media (max-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .sidebar { display: none; }
+}
+
+.card {
+    background: var(--surface); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 18px;
+}
+.card h3 { margin: 0 0 12px; font-size: 14px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .6px; }
+
+/* ---------- GÖNDERİ OLUŞTURMA ---------- */
+.composer textarea {
+    width: 100%; border: none; outline: none; resize: none;
+    font-size: 15px; min-height: 56px; background: transparent;
+}
+.composer-footer { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.char-count { font-size: 12px; color: var(--ink-soft); margin-left: auto; }
+.img-url-input {
+    width: 100%; margin-top: 8px; padding: 9px 12px;
+    border: 1px solid var(--line); border-radius: 10px; font-size: 13px; outline: none; display: none;
+}
+.img-url-input:focus { border-color: var(--primary); }
+
+.btn {
+    background: var(--primary); color: #fff; border: none;
+    padding: 9px 20px; border-radius: 999px; cursor: pointer;
+    font-weight: 600; font-size: 14px; transition: background .2s, transform .1s;
+}
+.btn:hover { background: var(--primary-deep); }
+.btn:active { transform: scale(.97); }
+.btn.ghost { background: var(--primary-soft); color: var(--primary-deep); }
+.btn.ghost:hover { background: #e4dbf8; }
+.btn.danger { background: #fdeaea; color: var(--danger); }
+.btn.danger:hover { background: #f9d8d8; }
+.btn.small { padding: 6px 14px; font-size: 13px; }
+
+/* ---------- GÖNDERİLER ---------- */
+.post { margin-top: 16px; }
+.post-head { display: flex; align-items: center; gap: 10px; }
+.post-author { font-weight: 600; cursor: pointer; }
+.post-author:hover { color: var(--primary); }
+.post-time { font-size: 12px; color: var(--ink-soft); }
+.post-menu { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--ink-soft); font-size: 16px; padding: 4px 8px; border-radius: 8px; }
+.post-menu:hover { background: var(--bg); color: var(--danger); }
+.post-content { margin: 12px 0 4px; font-size: 15px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
+.post-image { width: 100%; border-radius: 12px; margin-top: 10px; max-height: 460px; object-fit: cover; }
+.post-actions { display: flex; gap: 4px; margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; }
+.action-btn {
+    background: none; border: none; cursor: pointer; font-size: 13px; font-weight: 600;
+    color: var(--ink-soft); padding: 7px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px;
+    transition: background .15s;
+}
+.action-btn:hover { background: var(--bg); }
+.action-btn.liked { color: var(--like); }
+.action-btn.liked .heart { animation: pop .3s ease; }
+@keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.45); } 100% { transform: scale(1); } }
+
+.comments { margin-top: 10px; display: none; }
+.comment { display: flex; gap: 8px; padding: 7px 0; }
+.comment-bubble { background: var(--bg); border-radius: 12px; padding: 7px 12px; font-size: 13.5px; max-width: 100%; }
+.comment-bubble b { cursor: pointer; }
+.comment-bubble b:hover { color: var(--primary); }
+.comment-time { font-size: 11px; color: var(--ink-soft); margin-left: 8px; }
+.comment-form { display: flex; gap: 8px; margin-top: 8px; }
+.comment-form input {
+    flex: 1; padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px;
+    outline: none; font-size: 13.5px;
+}
+.comment-form input:focus { border-color: var(--primary); }
+
+.empty-state { text-align: center; color: var(--ink-soft); padding: 40px 20px; font-size: 14px; }
+.load-more { display: block; margin: 20px auto; }
+
+/* ---------- KENAR ÇUBUĞU ---------- */
+.side-user { display: flex; align-items: center; gap: 10px; padding: 7px 0; font-size: 14px; }
+.side-user .name { font-weight: 600; cursor: pointer; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.side-user .name:hover { color: var(--primary); }
+.status-dot { width: 9px; height: 9px; border-radius: 50%; background: #d3cde6; flex-shrink: 0; }
+.status-dot.online { background: var(--online); box-shadow: 0 0 6px var(--online); }
+
+/* ---------- KEŞFET ---------- */
+.discover-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.discover-item:last-child { border-bottom: none; }
+.discover-item .name { font-weight: 600; cursor: pointer; }
+.discover-item .name:hover { color: var(--primary); }
+.discover-item .actions { margin-left: auto; display: flex; gap: 6px; }
+
+/* ---------- PROFİL ---------- */
+.profile-header { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.profile-info h2 { margin: 0; font-family: 'Sora', sans-serif; font-size: 22px; }
+.profile-bio { color: var(--ink-soft); margin: 6px 0 0; font-size: 14px; white-space: pre-wrap; }
+.profile-stats { display: flex; gap: 20px; margin-top: 10px; font-size: 13.5px; color: var(--ink-soft); }
+.profile-stats b { color: var(--ink); font-size: 15px; }
+.field-label { font-weight: 600; font-size: 13px; display: block; margin: 12px 0 4px; }
+.field {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line);
+    border-radius: 10px; outline: none; font-size: 14px; resize: vertical;
+}
+.field:focus { border-color: var(--primary); }
+
+/* ---------- BİLDİRİM PANELİ ---------- */
+.notif-panel {
+    position: fixed; top: 62px; right: 20px; width: 330px; max-height: 420px;
+    background: var(--surface); border-radius: var(--radius); box-shadow: 0 10px 40px rgba(40,25,90,.18);
+    overflow-y: auto; z-index: 700; display: none;
+}
+.notif-panel h4 { margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--line); font-size: 14px; }
+.notif-item { display: flex; gap: 10px; align-items: center; padding: 12px 16px; font-size: 13.5px; border-bottom: 1px solid var(--line); }
+.notif-item.unread { background: var(--primary-soft); }
+.notif-item .when { font-size: 11px; color: var(--ink-soft); }
+
+/* ---------- GİRİŞ EKRANI ---------- */
+.auth-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: radial-gradient(1000px 600px at 20% 10%, #b79cf0 0%, transparent 55%),
+                radial-gradient(900px 600px at 85% 90%, #f2a0c6 0%, transparent 50%),
+                #2a2145;
+    display: flex; justify-content: center; align-items: center; padding: 16px;
+}
+.auth-box {
+    background: var(--surface); padding: 36px; border-radius: 22px;
+    width: 100%; max-width: 370px; text-align: center;
+    box-shadow: 0 20px 60px rgba(20,10,50,.35);
+}
+.auth-box .logo { font-size: 30px; }
+.auth-box p.tag { color: var(--ink-soft); font-size: 13.5px; margin: 6px 0 20px; }
+.auth-input {
+    width: 100%; padding: 12px 14px; margin: 7px 0;
+    border: 1px solid var(--line); border-radius: 12px; outline: none; font-size: 14px;
+}
+.auth-input:focus { border-color: var(--primary); }
+#authMessage { font-size: 13px; min-height: 18px; margin: 10px 0 0; }
+
+/* ---------- SOHBET ---------- */
+.chat-widget { position: fixed; bottom: 20px; right: 20px; z-index: 500; display: none; }
+.chat-toggle-btn {
+    position: relative; background: linear-gradient(135deg, var(--primary), #a06be0);
+    color: #fff; border: none; border-radius: 50%; width: 58px; height: 58px;
+    font-size: 23px; cursor: pointer; box-shadow: 0 6px 20px rgba(90,60,180,.4);
+    float: right; transition: transform .15s;
+}
+.chat-toggle-btn:hover { transform: scale(1.06); }
+.chat-panel {
+    background: var(--surface); width: 330px; height: 470px; border-radius: 18px;
+    box-shadow: 0 12px 45px rgba(30,15,75,.25);
+    display: none; flex-direction: column; margin-bottom: 14px; overflow: hidden;
+}
+.chat-header {
+    background: linear-gradient(135deg, var(--primary), #9a67dd);
+    color: #fff; padding: 14px 16px; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+}
+.typing-indicator { font-size: 11px; font-style: italic; opacity: .9; min-height: 14px; display: block; }
+.back-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 14px; font-weight: 700; display: none; }
+.contacts-list { flex: 1; overflow-y: auto; padding: 8px; list-style: none; margin: 0; }
+.contact-item {
+    padding: 10px 12px; cursor: pointer; border-radius: 12px;
+    display: flex; align-items: center; gap: 10px; transition: background .15s;
+}
+.contact-item:hover { background: var(--bg); }
+.contact-item .cname { font-weight: 600; font-size: 14px; flex: 1; }
+.unread-pill { background: var(--like); color: #fff; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 2px 7px; }
+.chat-room { display: none; flex: 1; flex-direction: column; min-height: 0; }
+.messages { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 0; list-style: none; }
+.message-item { max-width: 80%; padding: 8px 12px; border-radius: 14px; font-size: 13.5px; word-break: break-word; }
+.message-item .mtime { display: block; font-size: 10px; opacity: .65; margin-top: 3px; }
+.msg-received { background: var(--bg); align-self: flex-start; border-bottom-left-radius: 4px; }
+.msg-sent { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+.chat-input-area { padding: 10px; border-top: 1px solid var(--line); display: flex; gap: 6px; }
+.chat-input-area input { flex: 1; padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px; outline: none; font-size: 13.5px; }
+.chat-input-area input:focus { border-color: var(--primary); }
+
+.toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: var(--ink); color: #fff; padding: 11px 20px; border-radius: 999px;
+    font-size: 13.5px; z-index: 1100; opacity: 0; pointer-events: none; transition: all .25s;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- GİRİŞ EKRANI -->
+<div class="auth-overlay" id="authScreen">
+    <div class="auth-box">
+        <div class="logo">✨ Fantastic</div>
+        <p class="tag">Arkadaşlarınla paylaş, keşfet, sohbet et.</p>
+        <input type="text" id="authUsername" class="auth-input" placeholder="Kullanıcı adı" autocomplete="off">
+        <input type="password" id="authPassword" class="auth-input" placeholder="Şifre">
+        <button class="btn" style="width:100%; margin-top:10px;" onclick="handleLogin()">Giriş yap</button>
+        <button class="btn ghost" style="width:100%; margin-top:8px;" onclick="handleRegister()">Hesap oluştur</button>
+        <p id="authMessage"></p>
+    </div>
+</div>
+
+<!-- ÜST ÇUBUK -->
+<div class="topbar" id="topbar" style="display:none;">
+    <div class="logo" onclick="showView('feed')">✨ Fantastic</div>
+    <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Kullanıcı ara..." oninput="handleSearch()" onfocus="showView('discover')">
+    </div>
+    <div class="topbar-right">
+        <button class="icon-btn" title="Bildirimler" onclick="toggleNotifPanel(event)">🔔<span class="badge" id="notifBadge"></span></button>
+        <span id="myAvatarSlot" class="clickable" title="Profilim" onclick="showView('profile', state.userId)"></span>
+        <button class="icon-btn" title="Çıkış yap" onclick="logout()">⏻</button>
+    </div>
+</div>
+
+<!-- BİLDİRİM PANELİ -->
+<div class="notif-panel" id="notifPanel">
+    <h4>Bildirimler</h4>
+    <div id="notifList"></div>
+</div>
+
+<!-- ANA YERLEŞİM -->
+<div class="layout" id="mainLayout" style="display:none;">
+    <main>
+        <!-- AKIŞ -->
+        <section id="feedView">
+            <div class="card composer">
+                <textarea id="newPostContent" maxlength="1000" placeholder="Bugün neler harika?" oninput="updateCharCount()"></textarea>
+                <input type="text" id="newPostImage" class="img-url-input" placeholder="Görsel URL'si (https://...)">
+                <div class="composer-footer">
+                    <button class="btn ghost small" onclick="toggleImageInput()">🖼️ Görsel</button>
+                    <span class="char-count" id="charCount">0 / 1000</span>
+                    <button class="btn" onclick="createPost()">Paylaş</button>
+                </div>
+            </div>
+            <div id="feedArea"></div>
+            <button class="btn ghost load-more" id="loadMoreBtn" style="display:none;" onclick="loadMorePosts()">Daha fazla yükle</button>
+        </section>
+
+        <!-- KEŞFET -->
+        <section id="discoverView" style="display:none;">
+            <div class="card">
+                <h3>Kişileri keşfet</h3>
+                <div id="discoverList"></div>
+            </div>
+        </section>
+
+        <!-- PROFİL -->
+        <section id="profileView" style="display:none;">
+            <div class="card">
+                <div class="profile-header" id="profileHeader"></div>
+            </div>
+            <div class="card" id="profileEditCard" style="display:none; margin-top:16px;">
+                <h3>Profili düzenle</h3>
+                <label class="field-label">Profil resmi URL'si</label>
+                <input type="text" id="profileAvatar" class="field" placeholder="https://...">
+                <label class="field-label">Hakkımda</label>
+                <textarea id="profileBio" class="field" rows="3" maxlength="300" placeholder="Kendinden bahset..."></textarea>
+                <div style="text-align:right; margin-top:12px;">
+                    <button class="btn" onclick="updateProfile()">Kaydet</button>
+                </div>
+            </div>
+            <div id="profilePosts"></div>
+        </section>
+    </main>
+
+    <!-- KENAR ÇUBUĞU -->
+    <aside class="sidebar">
+        <div class="card" id="requestsCard" style="display:none;">
+            <h3>Arkadaşlık istekleri</h3>
+            <div id="requestsList"></div>
+        </div>
+        <div class="card">
+            <h3>Arkadaşlar</h3>
+            <div id="friendsList"><div class="empty-state" style="padding:10px;">Henüz arkadaşın yok.</div></div>
+        </div>
+    </aside>
+</div>
+
+<!-- SOHBET -->
+<div class="chat-widget" id="chatWidget">
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <button class="back-btn" id="backBtn" onclick="showContacts()">← Geri</button>
+            <div style="flex:1; min-width:0;">
+                <span id="chatTitle">Sohbetler</span>
+                <span id="typingStatus" class="typing-indicator"></span>
+            </div>
+        </div>
+        <ul class="contacts-list" id="contactsList"></ul>
+        <div class="chat-room" id="chatRoom">
+            <ul class="messages" id="chatMessages"></ul>
+            <div class="chat-input-area">
+                <input type="text" id="messageText" placeholder="Mesaj yaz..." autocomplete="off"
+                       oninput="handleTypingInput()" onkeydown="if(event.key==='Enter')sendMessage()">
+                <button class="btn small" onclick="sendMessage()">Gönder</button>
+            </div>
+        </div>
+    </div>
+    <button class="chat-toggle-btn" onclick="toggleChat()">💬<span class="badge" id="chatBadge" style="display:none;"></span></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================
+// DURUM
+// =====================================================
+// Backend adresi burada TEK YERDEN ayarlanır. Colab'ı her yeniden başlattığında
+// ngrok linki değişiyorsa, sadece bu satırı güncelleyip dosyayı tekrar yayınlaman yeterli.
+// Sabit bir sunucuda (kendi VPS'in vb.) çalıştırıyorsan bu adresi değiştirmene gerek kalmaz.
+const SERVER_URL = "https://xxxx.ngrok-free.app".replace(/\/+$/, "");
+
+const state = {
+    serverUrl: SERVER_URL,
+    token: localStorage.getItem("fantastic_token") || "",
+    userId: localStorage.getItem("fantastic_uid") || "",
+    username: localStorage.getItem("fantastic_uname") || "",
+    avatarUrl: localStorage.getItem("fantastic_avatar") || "",
+    ws: null,
+    onlineUsers: [],
+    friends: [],
+    unreadMsgs: {},          // { senderId: count }
+    activeChatId: null,
+    activeChatName: "",
+    feedPage: 1,
+    feedPosts: [],
+    typingTimer: null,
+    searchTimer: null,
+};
+
+// =====================================================
+// YARDIMCILAR
+// =====================================================
+function esc(s) {
+    return String(s ?? "").replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+}
+
+function timeAgo(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (isNaN(d)) return "";
+    const s = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (s < 60) return "az önce";
+    if (s < 3600) return Math.floor(s / 60) + " dk";
+    if (s < 86400) return Math.floor(s / 3600) + " sa";
+    if (s < 604800) return Math.floor(s / 86400) + " g";
+    return d.toLocaleDateString("tr-TR", { day: "numeric", month: "short" });
+}
+
+function clockTime(iso) {
+    const d = new Date(iso);
+    return isNaN(d) ? "" : d.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit" });
+}
+
+// Avatar yoksa isim baş harfiyle renkli daire üret
+function avatarHTML(user, size = "") {
+    const cls = size ? `avatar ${size}` : "avatar";
+    if (user.avatar_url) {
+        return `<img src="${esc(user.avatar_url)}" class="${cls}" alt="" onerror="this.outerHTML=fallbackAvatar('${esc(user.username)}','${esc(user.id)}','${size}')">`;
+    }
+    return fallbackAvatar(user.username, user.id, size);
+}
+function fallbackAvatar(name, id, size) {
+    const hue = (parseInt(id || "0", 10) * 57) % 360;
+    const initial = (name || "?").charAt(0).toUpperCase();
+    const cls = size ? `avatar-fallback ${size}` : "avatar-fallback";
+    return `<div class="${cls}" style="background:linear-gradient(135deg,hsl(${hue},60%,62%),hsl(${(hue+45)%360},65%,55%))">${esc(initial)}</div>`;
+}
+
+function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 2600);
+}
+
+async function api(path, options = {}) {
+    if (!state.serverUrl) {
+        throw new Error("Sunucu adresi ayarlanmamış (SERVER_URL sabiti boş).");
+    }
+    options.headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+    if (state.token) options.headers["Authorization"] = "Bearer " + state.token;
+    const res = await fetch(state.serverUrl + path, options);
+    if (res.status === 401) { logout(); throw new Error("Oturum süresi doldu."); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.detail || "Bir hata oluştu.");
+    return data;
+}
+
+// =====================================================
+// KİMLİK
+// =====================================================
+async function handleRegister() {
+    const username = document.getElementById("authUsername").value.trim();
+    const password = document.getElementById("authPassword").value;
+    const msg = document.getElementById("authMessage");
+    try {
+        const data = await api("/register", { method: "POST", body: JSON.stringify({ username, password }) });
+        msg.style.color = "var(--online)";
+        msg.textContent = data.message;
+    } catch (e) {
+        msg.style.color = "var(--danger)";
+        msg.textContent = e.message;
+    }
+}
+
+async function handleLogin() {
+    const username = document.getElementById("authUsername").value.trim();
+    const password = document.getElementById("authPassword").value;
+    const msg = document.getElementById("authMessage");
+    try {
+        const data = await api("/login", { method: "POST", body: JSON.stringify({ username, password }) });
+        state.token = data.access_token;
+        state.userId = data.user_id;
+        state.username = data.username;
+        state.avatarUrl = data.avatar_url || "";
+        localStorage.setItem("fantastic_token", state.token);
+        localStorage.setItem("fantastic_uid", state.userId);
+        localStorage.setItem("fantastic_uname", state.username);
+        localStorage.setItem("fantastic_avatar", state.avatarUrl);
+        enterApp();
+    } catch (e) {
+        msg.style.color = "var(--danger)";
+        msg.textContent = e.message;
+    }
+}
+
+function logout() {
+    localStorage.removeItem("fantastic_token");
+    localStorage.removeItem("fantastic_uid");
+    localStorage.removeItem("fantastic_uname");
+    localStorage.removeItem("fantastic_avatar");
+    if (state.ws) { state.ws.onclose = null; state.ws.close(); }
+    location.reload();
+}
+
+function enterApp() {
+    document.getElementById("authScreen").style.display = "none";
+    document.getElementById("topbar").style.display = "flex";
+    document.getElementById("mainLayout").style.display = "grid";
+    document.getElementById("chatWidget").style.display = "block";
+    document.getElementById("myAvatarSlot").innerHTML = avatarHTML({ username: state.username, id: state.userId, avatar_url: state.avatarUrl });
+    connectWebSocket();
+    loadFeed(true);
+    loadFriends();
+    loadRequests();
+    loadNotifications();
+    loadUnreadCounts();
+}
+
+// =====================================================
+// GÖRÜNÜMLER
+// =====================================================
+function showView(view, profileId = null) {
+    ["feedView", "discoverView", "profileView"].forEach(id => document.getElementById(id).style.display = "none");
+    if (view === "feed") { document.getElementById("feedView").style.display = "block"; loadFeed(true); }
+    if (view === "discover") { document.getElementById("discoverView").style.display = "block"; loadDiscover(); }
+    if (view === "profile") { document.getElementById("profileView").style.display = "block"; loadProfile(profileId); }
+    document.getElementById("notifPanel").style.display = "none";
+}
+
+// =====================================================
+// AKIŞ
+// =====================================================
+function updateCharCount() {
+    const v = document.getElementById("newPostContent").value;
+    document.getElementById("charCount").textContent = `${v.length} / 1000`;
+}
+function toggleImageInput() {
+    const el = document.getElementById("newPostImage");
+    el.style.display = el.style.display === "block" ? "none" : "block";
+    if (el.style.display === "block") el.focus();
+}
+
+async function loadFeed(reset = false, silent = false) {
+    if (reset) { state.feedPage = 1; state.feedPosts = []; }
+    try {
+        const data = await api(`/posts?page=${state.feedPage}&limit=10`);
+        state.feedPosts = reset ? data.posts : state.feedPosts.concat(data.posts);
+        renderPosts(state.feedPosts, "feedArea");
+        document.getElementById("loadMoreBtn").style.display = data.has_more ? "block" : "none";
+    } catch (e) { if (!silent) toast(e.message); }
+}
+function loadMorePosts() { state.feedPage++; loadFeed(false); }
+
+function renderPosts(posts, targetId) {
+    const area = document.getElementById(targetId);
+    if (!posts.length) {
+        area.innerHTML = `<div class="card empty-state" style="margin-top:16px;">Henüz gönderi yok. İlk paylaşımı sen yap! ✨</div>`;
+        return;
+    }
+    area.innerHTML = posts.map(p => `
+        <div class="card post">
+            <div class="post-head">
+                <span class="clickable" onclick="showView('profile','${esc(p.user_id)}')">${avatarHTML(p)}</span>
+                <div>
+                    <div class="post-author" onclick="showView('profile','${esc(p.user_id)}')">${esc(p.username)}</div>
+                    <div class="post-time">${timeAgo(p.created_at)}</div>
+                </div>
+                ${p.is_mine ? `<button class="post-menu" title="Gönderiyi sil" onclick="deletePost(${p.id})">🗑</button>` : ""}
+            </div>
+            <div class="post-content">${esc(p.content)}</div>
+            ${p.image_url ? `<img class="post-image" src="${esc(p.image_url)}" alt="" onerror="this.remove()">` : ""}
+            <div class="post-actions">
+                <button class="action-btn ${p.liked_by_me ? "liked" : ""}" onclick="toggleLike(${p.id})">
+                    <span class="heart">${p.liked_by_me ? "❤️" : "🤍"}</span> ${p.likes_count}
+                </button>
+                <button class="action-btn" onclick="toggleComments(${p.id})">💬 ${p.comments.length}</button>
+            </div>
+            <div class="comments" id="comments-${p.id}">
+                ${p.comments.map(c => `
+                    <div class="comment">
+                        <div class="comment-bubble">
+                            <b onclick="showView('profile','${esc(c.user_id)}')">${esc(c.username)}</b>
+                            <span class="comment-time">${timeAgo(c.created_at)}</span><br>${esc(c.content)}
+                        </div>
+                    </div>`).join("")}
+                <div class="comment-form">
+                    <input type="text" id="comment-input-${p.id}" placeholder="Yorum yaz..."
+                           onkeydown="if(event.key==='Enter')submitComment(${p.id})">
+                    <button class="btn small" onclick="submitComment(${p.id})">Gönder</button>
+                </div>
+            </div>
+        </div>
+    `).join("");
+}
+
+function toggleComments(postId) {
+    const el = document.getElementById(`comments-${postId}`);
+    el.style.display = el.style.display === "block" ? "none" : "block";
+}
+
+async function createPost() {
+    const content = document.getElementById("newPostContent").value;
+    const image_url = document.getElementById("newPostImage").value;
+    try {
+        await api("/posts", { method: "POST", body: JSON.stringify({ content, image_url }) });
+        document.getElementById("newPostContent").value = "";
+        document.getElementById("newPostImage").value = "";
+        document.getElementById("newPostImage").style.display = "none";
+        updateCharCount();
+        loadFeed(true);
+    } catch (e) { toast(e.message); }
+}
+
+async function deletePost(id) {
+    if (!confirm("Bu gönderiyi silmek istediğine emin misin?")) return;
+    try { await api(`/posts/${id}`, { method: "DELETE" }); loadFeed(true); toast("Gönderi silindi."); }
+    catch (e) { toast(e.message); }
+}
+
+async function toggleLike(postId) {
+    try { await api("/posts/like", { method: "POST", body: JSON.stringify({ post_id: postId }) }); }
+    catch (e) { toast(e.message); }
+}
+
+async function submitComment(postId) {
+    const input = document.getElementById(`comment-input-${postId}`);
+    const content = input.value.trim();
+    if (!content) return;
+    try {
+        await api("/posts/comment", { method: "POST", body: JSON.stringify({ post_id: postId, content }) });
+        input.value = "";
+    } catch (e) { toast(e.message); }
+}
+
+// Akış güncellenince açık yorum kutularını koru
+async function refreshFeedSilently() {
+    const openComments = [...document.querySelectorAll(".comments")]
+        .filter(el => el.style.display === "block")
+        .map(el => el.id);
+    const pages = state.feedPage;
+    state.feedPage = 1; state.feedPosts = [];
+    for (let i = 1; i <= pages; i++) {
+        state.feedPage = i;
+        try {
+            const data = await api(`/posts?page=${i}&limit=10`);
+            state.feedPosts = state.feedPosts.concat(data.posts);
+            if (i === pages) {
+                renderPosts(state.feedPosts, "feedArea");
+                document.getElementById("loadMoreBtn").style.display = data.has_more ? "block" : "none";
+            }
+        } catch (e) { break; }
+    }
+    openComments.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = "block"; });
+}
+
+// =====================================================
+// KEŞFET & ARAMA
+// =====================================================
+function handleSearch() {
+    clearTimeout(state.searchTimer);
+    state.searchTimer = setTimeout(loadDiscover, 300);
+}
+
+async function loadDiscover() {
+    const q = document.getElementById("searchInput").value;
+    try {
+        const users = await api(`/users/discover?q=${encodeURIComponent(q)}`);
+        const list = document.getElementById("discoverList");
+        if (!users.length) { list.innerHTML = `<div class="empty-state">Kullanıcı bulunamadı.</div>`; return; }
+        list.innerHTML = users.map(u => {
+            let actions = "";
+            if (u.status === "none") actions = `<button class="btn small" onclick="sendRequest('${esc(u.id)}')">+ Ekle</button>`;
+            else if (u.status === "sent_pending") actions = `<button class="btn ghost small" disabled>İstek gönderildi</button>`;
+            else if (u.status === "received_pending") actions = `
+                <button class="btn small" onclick="acceptRequest('${esc(u.id)}')">Kabul et</button>
+                <button class="btn danger small" onclick="rejectRequest('${esc(u.id)}')">Reddet</button>`;
+            else if (u.status === "accepted") actions = `<button class="btn ghost small" onclick="openChatWith('${esc(u.id)}','${esc(u.username)}')">💬 Mesaj</button>`;
+            return `
+                <div class="discover-item">
+                    <span class="clickable" onclick="showView('profile','${esc(u.id)}')">${avatarHTML(u)}</span>
+                    <span class="name" onclick="showView('profile','${esc(u.id)}')">${esc(u.username)}</span>
+                    <div class="actions">${actions}</div>
+                </div>`;
+        }).join("");
+    } catch (e) { toast(e.message); }
+}
+
+// =====================================================
+// ARKADAŞLIK
+// =====================================================
+async function sendRequest(id) {
+    try { await api("/friends/request", { method: "POST", body: JSON.stringify({ target_id: id }) }); toast("Arkadaşlık isteği gönderildi."); loadDiscover(); }
+    catch (e) { toast(e.message); }
+}
+async function acceptRequest(id) {
+    try {
+        await api("/friends/accept", { method: "POST", body: JSON.stringify({ target_id: id }) });
+        toast("Arkadaşlık isteği kabul edildi.");
+        loadRequests(); loadFriends();
+        if (document.getElementById("discoverView").style.display === "block") loadDiscover();
+    } catch (e) { toast(e.message); }
+}
+async function rejectRequest(id) {
+    try {
+        await api("/friends/reject", { method: "POST", body: JSON.stringify({ target_id: id }) });
+        loadRequests();
+        if (document.getElementById("discoverView").style.display === "block") loadDiscover();
+    } catch (e) { toast(e.message); }
+}
+async function removeFriend(id) {
+    if (!confirm("Bu kişiyi arkadaşlıktan çıkarmak istiyor musun?")) return;
+    try { await api("/friends/remove", { method: "POST", body: JSON.stringify({ target_id: id }) }); toast("Arkadaşlıktan çıkarıldı."); loadFriends(); showView("feed"); }
+    catch (e) { toast(e.message); }
+}
+
+async function loadFriends() {
+    try {
+        state.friends = await api("/friends");
+        renderFriendsSidebar();
+        renderContacts();
+    } catch (e) {}
+}
+
+function renderFriendsSidebar() {
+    const list = document.getElementById("friendsList");
+    if (!state.friends.length) {
+        list.innerHTML = `<div class="empty-state" style="padding:10px;">Henüz arkadaşın yok.<br><span class="clickable" style="color:var(--primary); font-weight:600;" onclick="showView('discover')">Kişileri keşfet →</span></div>`;
+        return;
+    }
+    list.innerHTML = state.friends.map(f => `
+        <div class="side-user">
+            ${avatarHTML(f, "avatar-sm")}
+            <span class="name" onclick="showView('profile','${esc(f.id)}')">${esc(f.username)}</span>
+            <span class="status-dot ${state.onlineUsers.includes(f.id) ? "online" : ""}"></span>
+        </div>`).join("");
+}
+
+async function loadRequests() {
+    try {
+        const reqs = await api("/friends/requests");
+        const card = document.getElementById("requestsCard");
+        if (!reqs.length) { card.style.display = "none"; return; }
+        card.style.display = "block";
+        document.getElementById("requestsList").innerHTML = reqs.map(u => `
+            <div class="side-user">
+                ${avatarHTML(u, "avatar-sm")}
+                <span class="name" onclick="showView('profile','${esc(u.id)}')">${esc(u.username)}</span>
+                <button class="btn small" onclick="acceptRequest('${esc(u.id)}')">✓</button>
+                <button class="btn danger small" onclick="rejectRequest('${esc(u.id)}')">✕</button>
+            </div>`).join("");
+    } catch (e) {}
+}
+
+// =====================================================
+// PROFİL
+// =====================================================
+async function loadProfile(userId) {
+    const isMe = userId === state.userId;
+    try {
+        const p = await api(`/profile/${userId}`);
+        const editCard = document.getElementById("profileEditCard");
+        editCard.style.display = isMe ? "block" : "none";
+        if (isMe) {
+            document.getElementById("profileAvatar").value = p.avatar_url || "";
+            document.getElementById("profileBio").value = p.bio || "";
+        }
+
+        let actionBtn = "";
+        if (!isMe) {
+            const isFriend = state.friends.some(f => f.id === userId);
+            actionBtn = isFriend
+                ? `<div style="margin-top:12px; display:flex; gap:8px;">
+                     <button class="btn small" onclick="openChatWith('${esc(userId)}','${esc(p.username)}')">💬 Mesaj gönder</button>
+                     <button class="btn danger small" onclick="removeFriend('${esc(userId)}')">Arkadaşlıktan çıkar</button>
+                   </div>`
+                : `<div style="margin-top:12px;"><button class="btn small" onclick="sendRequest('${esc(userId)}')">+ Arkadaş ekle</button></div>`;
+        }
+
+        document.getElementById("profileHeader").innerHTML = `
+            ${avatarHTML(p, "avatar-lg")}
+            <div class="profile-info">
+                <h2>${esc(p.username)}</h2>
+                ${p.bio ? `<p class="profile-bio">${esc(p.bio)}</p>` : ""}
+                <div class="profile-stats">
+                    <span><b>${p.post_count}</b> gönderi</span>
+                    <span><b>${p.friend_count}</b> arkadaş</span>
+                </div>
+                ${actionBtn}
+            </div>`;
+
+        const data = await api(`/posts?page=1&limit=20&user_id=${userId}`);
+        renderPosts(data.posts, "profilePosts");
+    } catch (e) { toast(e.message); }
+}
+
+async function updateProfile() {
+    const avatar_url = document.getElementById("profileAvatar").value;
+    const bio = document.getElementById("profileBio").value;
+    try {
+        await api("/profile/update", { method: "POST", body: JSON.stringify({ avatar_url, bio }) });
+        state.avatarUrl = avatar_url;
+        localStorage.setItem("fantastic_avatar", avatar_url);
+        document.getElementById("myAvatarSlot").innerHTML = avatarHTML({ username: state.username, id: state.userId, avatar_url });
+        toast("Profil kaydedildi.");
+        loadProfile(state.userId);
+    } catch (e) { toast(e.message); }
+}
+
+// =====================================================
+// BİLDİRİMLER
+// =====================================================
+const NOTIF_TEXT = {
+    like: "gönderini beğendi",
+    comment: "gönderine yorum yaptı",
+    friend_request: "sana arkadaşlık isteği gönderdi",
+    friend_accept: "arkadaşlık isteğini kabul etti",
+};
+
+async function loadNotifications() {
+    try {
+        const data = await api("/notifications");
+        const badge = document.getElementById("notifBadge");
+        badge.style.display = data.unread > 0 ? "flex" : "none";
+        badge.textContent = data.unread > 9 ? "9+" : data.unread;
+
+        const list = document.getElementById("notifList");
+        if (!data.notifications.length) {
+            list.innerHTML = `<div class="empty-state">Henüz bildirimin yok.</div>`;
+            return;
+        }
+        list.innerHTML = data.notifications.map(n => `
+            <div class="notif-item ${n.is_read ? "" : "unread"} clickable" onclick="showView('profile','${esc(n.actor_id)}')">
+                <div>
+                    <b>${esc(n.actor_name)}</b> ${NOTIF_TEXT[n.type] || ""}
+                    <div class="when">${timeAgo(n.created_at)}</div>
+                </div>
+            </div>`).join("");
+    } catch (e) {}
+}
+
+async function toggleNotifPanel(event) {
+    event.stopPropagation();
+    const panel = document.getElementById("notifPanel");
+    const opening = panel.style.display !== "block";
+    panel.style.display = opening ? "block" : "none";
+    if (opening) {
+        await loadNotifications();
+        try { await api("/notifications/read", { method: "POST" }); } catch (e) {}
+        document.getElementById("notifBadge").style.display = "none";
+    }
+}
+document.addEventListener("click", (e) => {
+    const panel = document.getElementById("notifPanel");
+    if (panel.style.display === "block" && !panel.contains(e.target)) panel.style.display = "none";
+});
+
+// =====================================================
+// SOHBET
+// =====================================================
+function toggleChat() {
+    const panel = document.getElementById("chatPanel");
+    panel.style.display = panel.style.display === "flex" ? "none" : "flex";
+    if (panel.style.display === "flex") { showContacts(); }
+}
+
+function showContacts() {
+    state.activeChatId = null;
+    document.getElementById("chatRoom").style.display = "none";
+    document.getElementById("contactsList").style.display = "block";
+    document.getElementById("backBtn").style.display = "none";
+    document.getElementById("chatTitle").textContent = "Sohbetler";
+    document.getElementById("typingStatus").textContent = "";
+    renderContacts();
+}
+
+function renderContacts() {
+    const list = document.getElementById("contactsList");
+    if (!state.friends.length) {
+        list.innerHTML = `<div class="empty-state">Mesajlaşmak için önce arkadaş ekle.</div>`;
+        updateChatBadge();
+        return;
+    }
+    list.innerHTML = state.friends.map(f => {
+        const unread = state.unreadMsgs[f.id] || 0;
+        return `
+        <li class="contact-item" onclick="openChatWith('${esc(f.id)}','${esc(f.username)}')">
+            ${avatarHTML(f, "avatar-sm")}
+            <span class="cname">${esc(f.username)}</span>
+            ${unread > 0 ? `<span class="unread-pill">${unread}</span>` : ""}
+            <span class="status-dot ${state.onlineUsers.includes(f.id) ? "online" : ""}"></span>
+        </li>`;
+    }).join("");
+    updateChatBadge();
+}
+
+function updateChatBadge() {
+    const total = Object.values(state.unreadMsgs).reduce((a, b) => a + b, 0);
+    const badge = document.getElementById("chatBadge");
+    badge.style.display = total > 0 ? "flex" : "none";
+    badge.textContent = total > 9 ? "9+" : total;
+}
+
+async function openChatWith(friendId, friendName) {
+    document.getElementById("chatWidget").style.display = "block";
+    document.getElementById("chatPanel").style.display = "flex";
+    state.activeChatId = friendId;
+    state.activeChatName = friendName;
+    delete state.unreadMsgs[friendId];
+    updateChatBadge();
+
+    document.getElementById("contactsList").style.display = "none";
+    document.getElementById("chatRoom").style.display = "flex";
+    document.getElementById("backBtn").style.display = "block";
+    document.getElementById("chatTitle").textContent = friendName;
+    document.getElementById("typingStatus").textContent = "";
+
+    try {
+        const msgs = await api(`/messages/${friendId}`);
+        const ul = document.getElementById("chatMessages");
+        ul.innerHTML = msgs.map(m => renderMessage(m.content, m.sender_id === state.userId, m.created_at)).join("");
+        ul.scrollTop = ul.scrollHeight;
+    } catch (e) { toast(e.message); }
+    document.getElementById("messageText").focus();
+}
+
+function renderMessage(content, mine, iso) {
+    return `<li class="message-item ${mine ? "msg-sent" : "msg-received"}">${esc(content)}<span class="mtime">${clockTime(iso)}</span></li>`;
+}
+
+function appendMessage(content, mine, iso) {
+    const ul = document.getElementById("chatMessages");
+    ul.insertAdjacentHTML("beforeend", renderMessage(content, mine, iso || new Date().toISOString()));
+    ul.scrollTop = ul.scrollHeight;
+}
+
+function sendMessage() {
+    const input = document.getElementById("messageText");
+    const content = input.value.trim();
+    if (!content || !state.activeChatId || !state.ws) return;
+    state.ws.send(JSON.stringify({ type: "message", receiver_id: state.activeChatId, content }));
+    appendMessage(content, true);
+    input.value = "";
+    state.ws.send(JSON.stringify({ type: "typing", receiver_id: state.activeChatId, is_typing: false }));
+}
+
+function handleTypingInput() {
+    if (!state.activeChatId || !state.ws) return;
+    state.ws.send(JSON.stringify({ type: "typing", receiver_id: state.activeChatId, is_typing: true }));
+    clearTimeout(state.typingTimer);
+    state.typingTimer = setTimeout(() => {
+        if (state.ws && state.activeChatId)
+            state.ws.send(JSON.stringify({ type: "typing", receiver_id: state.activeChatId, is_typing: false }));
+    }, 1500);
+}
+
+async function loadUnreadCounts() {
+    try {
+        state.unreadMsgs = await api("/messages/unread");
+        renderContacts();
+    } catch (e) {}
+}
+
+// =====================================================
+// WEBSOCKET
+// =====================================================
+function connectWebSocket() {
+    // serverUrl "https://xxxx.ngrok-free.app" gibi bir tam adrestir; ws(s):// şemasına çeviriyoruz.
+    const wsHost = state.serverUrl.replace(/^https?:\/\//, "");
+    const wsProto = state.serverUrl.startsWith("https://") ? "wss" : "ws";
+    state.ws = new WebSocket(`${wsProto}://${wsHost}/ws?token=${encodeURIComponent(state.token)}`);
+
+    state.ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "status_update") {
+            state.onlineUsers = data.online_users || [];
+            renderFriendsSidebar();
+            renderContacts();
+        }
+        else if (data.type === "feed_update") {
+            if (document.getElementById("feedView").style.display !== "none") refreshFeedSilently();
+        }
+        else if (data.type === "notification") {
+            loadNotifications();
+            loadRequests();
+            loadFriends();
+        }
+        else if (data.type === "message") {
+            if (state.activeChatId === data.sender_id) {
+                appendMessage(data.message, false, data.created_at);
+            } else {
+                state.unreadMsgs[data.sender_id] = (state.unreadMsgs[data.sender_id] || 0) + 1;
+                renderContacts();
+                const friend = state.friends.find(f => f.id === data.sender_id);
+                toast(`💬 ${friend ? friend.username : "Yeni mesaj"}: ${data.message.slice(0, 40)}`);
+            }
+        }
+        else if (data.type === "typing") {
+            if (state.activeChatId === data.sender_id) {
+                document.getElementById("typingStatus").textContent = data.is_typing ? "yazıyor..." : "";
+            }
+        }
+    };
+
+    state.ws.onclose = () => setTimeout(connectWebSocket, 3000);
+}
+
+// =====================================================
+// BAŞLANGIÇ
+// =====================================================
+(async () => {
+    if (state.token) {
+        try {
+            const me = await api("/me");
+            state.username = me.username;
+            state.avatarUrl = me.avatar_url;
+            enterApp();
+        } catch (e) { /* token geçersiz, giriş ekranı kalır */ }
+    }
+    document.getElementById("authPassword").addEventListener("keydown", e => { if (e.key === "Enter") handleLogin(); });
+})();
+</script>
+</body>
+</html>
